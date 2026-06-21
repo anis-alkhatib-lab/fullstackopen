@@ -6,18 +6,35 @@ const Header = ({ text }) => <h1>{text}</h1>;
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
 
-const Statistic = ({ text, value }) => {
-  if (text === "positive") {
-    return (
-      <p>
-        {text} {value} %
-      </p>
-    );
-  }
+const ValueStatistic = ({ text, value }) => {
   return (
     <p>
       {text} {value}
     </p>
+  );
+};
+
+const PercentageStatistic = ({ text, value }) => {
+  return (
+    <p>
+      {text} {value} %
+    </p>
+  );
+};
+
+const Statistics = ({ good, neutral, bad, all, avg, positive }) => {
+  if (all === 0) {
+    return <p>no feedback given</p>;
+  }
+  return (
+    <>
+      <ValueStatistic text={"good"} value={good} />
+      <ValueStatistic text={"neutral"} value={neutral} />
+      <ValueStatistic text={"bad"} value={bad} />
+      <ValueStatistic text={"all"} value={all} />
+      <ValueStatistic text={"average"} value={avg} />
+      <PercentageStatistic text={"positive"} value={positive} />
+    </>
   );
 };
 
@@ -27,8 +44,8 @@ const App = () => {
   const [bad, setBad] = useState(0);
 
   const all = good + neutral + bad;
-  const avg = (good - bad) / all;
-  const positive = (good * 100) / all;
+  const avg = all == 0 ? 0 : (good - bad) / all;
+  const positive = all == 0 ? 0 : (good * 100) / all;
 
   const handleGood = () => {
     const updatedGood = good + 1;
@@ -52,12 +69,14 @@ const App = () => {
       <Button onClick={handleNeutral} text={"neutral"} />
       <Button onClick={handleBad} text={"bad"} />
       <Header text={"statistics"} />
-      <Statistic text={"good"} value={good} />
-      <Statistic text={"neutral"} value={neutral} />
-      <Statistic text={"bad"} value={bad} />
-      <Statistic text={"all"} value={all} />
-      <Statistic text={"average"} value={avg} />
-      <Statistic text={"positive"} value={positive} />
+      <Statistics
+        good={good}
+        neutral={neutral}
+        bad={bad}
+        all={all}
+        avg={avg}
+        positive={positive}
+      />
     </div>
   );
 };

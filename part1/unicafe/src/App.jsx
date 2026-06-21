@@ -6,18 +6,10 @@ const Header = ({ text }) => <h1>{text}</h1>;
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
 
-const ValueStatistic = ({ text, value }) => {
+const StatisticLine = ({ text, value }) => {
   return (
     <p>
-      {text} {value}
-    </p>
-  );
-};
-
-const PercentageStatistic = ({ text, value }) => {
-  return (
-    <p>
-      {text} {value} %
+      {text} {value} {text == "positive" ? "%" : ""}
     </p>
   );
 };
@@ -28,12 +20,12 @@ const Statistics = ({ good, neutral, bad, all, avg, positive }) => {
   }
   return (
     <>
-      <ValueStatistic text={"good"} value={good} />
-      <ValueStatistic text={"neutral"} value={neutral} />
-      <ValueStatistic text={"bad"} value={bad} />
-      <ValueStatistic text={"all"} value={all} />
-      <ValueStatistic text={"average"} value={avg} />
-      <PercentageStatistic text={"positive"} value={positive} />
+      <StatisticLine text={"good"} value={good} />
+      <StatisticLine text={"neutral"} value={neutral} />
+      <StatisticLine text={"bad"} value={bad} />
+      <StatisticLine text={"all"} value={all} />
+      <StatisticLine text={"average"} value={avg} />
+      <StatisticLine text={"positive"} value={positive} />
     </>
   );
 };

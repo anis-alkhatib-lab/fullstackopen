@@ -8,9 +8,12 @@ const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
 
 const StatisticLine = ({ text, value }) => {
   return (
-    <p>
-      {text} {value} {text == "positive" ? "%" : ""}
-    </p>
+    <tr>
+      <td>{text}</td>
+      <td>
+        {Number(value.toFixed(1))} {text == "positive" ? "%" : ""}
+      </td>
+    </tr>
   );
 };
 
@@ -19,14 +22,16 @@ const Statistics = ({ good, neutral, bad, all, avg, positive }) => {
     return <p>no feedback given</p>;
   }
   return (
-    <>
-      <StatisticLine text={"good"} value={good} />
-      <StatisticLine text={"neutral"} value={neutral} />
-      <StatisticLine text={"bad"} value={bad} />
-      <StatisticLine text={"all"} value={all} />
-      <StatisticLine text={"average"} value={avg} />
-      <StatisticLine text={"positive"} value={positive} />
-    </>
+    <table>
+      <tbody>
+        <StatisticLine text={"good"} value={good} />
+        <StatisticLine text={"neutral"} value={neutral} />
+        <StatisticLine text={"bad"} value={bad} />
+        <StatisticLine text={"all"} value={all} />
+        <StatisticLine text={"average"} value={avg} />
+        <StatisticLine text={"positive"} value={positive} />
+      </tbody>
+    </table>
   );
 };
 

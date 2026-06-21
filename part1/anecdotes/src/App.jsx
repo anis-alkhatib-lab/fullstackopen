@@ -1,11 +1,14 @@
 import { useState } from "react";
 
-const Anecdote = ({ text }) => {
-  return <p>{text}</p>;
-};
-
-const Votes = ({ votes }) => {
-  return <p>has {votes} votes</p>;
+const Anecdote = ({ text, votes }) => {
+  return (
+    <div>
+      <p>
+        <em>{text}</em>
+      </p>
+      <p>has {votes || 0} votes</p>
+    </div>
+  );
 };
 
 const Button = ({ text, onClick }) => {
@@ -38,14 +41,33 @@ const App = () => {
     setVotes(copy);
   };
 
+  const mostVotedIndex = getMaxVoted(votes);
+
   return (
     <div>
-      <Anecdote text={anecdotes[selected]} />
-      <Votes votes={votes[selected]} />
+      <h1>Anecdote of the day</h1>
+      <Anecdote text={anecdotes[selected]} votes={votes[selected]} />
       <Button onClick={handleVotes} text={"vote"} />
       <Button onClick={handleSelection} text={"next anecdote"} />
+      <h1>Anecdote with most votes</h1>
+      <Anecdote
+        text={anecdotes[mostVotedIndex]}
+        votes={votes[mostVotedIndex] || 0}
+      />
     </div>
   );
+};
+
+const getMaxVoted = (votes) => {
+  const keys = Object.keys(votes);
+
+  if (keys.length === 0) {
+    return 0;
+  }
+
+  return keys.reduce((maxIndex, currentIndex) => {
+    return votes[currentIndex] > votes[maxIndex] ? currentIndex : maxIndex;
+  }, keys[0]);
 };
 
 export default App;

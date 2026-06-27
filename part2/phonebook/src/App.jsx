@@ -43,8 +43,27 @@ const App = () => {
     };
 
     if (contacts.some((n) => n.name.toLowerCase() === newName.toLowerCase())) {
-      alert(`${newName} is already added to phonebook`);
+      if (
+        window.confirm(
+          `${newName} is already in the phonebook, replace old number with the new one?`,
+        )
+      ) {
+        const contactToUpdate = contacts.find(
+          (c) => c.name.toLowerCase() === newName.toLowerCase(),
+        );
+        const updatedContact = { ...contactToUpdate, number: newNumber };
+        contactService
+          .update(contactToUpdate.id, updatedContact)
+          .then((updateResult) => {
+            setContacts(
+              contacts.map((c) =>
+                c.id !== updateResult.id ? updateResult : c,
+              ),
+            );
+          });
+      }
       setNewName("");
+      setNewNumber("");
       return;
     }
 

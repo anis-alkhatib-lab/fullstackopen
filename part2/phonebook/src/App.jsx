@@ -68,6 +68,20 @@ const App = () => {
     setNewNumber("");
   };
 
+  const deleteContact = (id) => {
+    const contactToDelete = contacts.find((c) => c.id === id);
+
+    if (
+      window.confirm(
+        `Are you sure you want to delete contact: '${contactToDelete?.name}'?`,
+      )
+    ) {
+      contactService.remove(id).then(() => {
+        setContacts(contacts.filter((c) => c.id !== id));
+      });
+    }
+  };
+
   return (
     <div>
       <h1>Phonebook</h1>
@@ -80,7 +94,7 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Contacts</h2>
-      <Contacts contacts={contactsToShow} />
+      <Contacts contacts={contactsToShow} onDelete={deleteContact} />
     </div>
   );
 };

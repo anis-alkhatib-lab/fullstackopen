@@ -4,6 +4,9 @@ import Filter from "./Components/Filter";
 import AddContact from "./Components/AddContact";
 import contacService from "./services/contacts";
 import contactService from "./services/contacts";
+import Notification from "./Components/Notification";
+import Error from "./Components/Error";
+import "./index.css";
 
 const App = () => {
   const [contacts, setContacts] = useState([]);
@@ -11,11 +14,13 @@ const App = () => {
     contacService.getAll().then((initialContacts) => {
       setContacts(initialContacts);
     });
-  });
+  }, []);
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useState(null);
+  const [error, setError] = useState(null);
 
   const onFilterChange = (e) => {
     setFilter(e.target.value);
@@ -57,9 +62,15 @@ const App = () => {
           .then((updateResult) => {
             setContacts(
               contacts.map((c) =>
-                c.id !== updateResult.id ? updateResult : c,
+                c.id === updateResult.id ? updateResult : c,
               ),
             );
+            setNotification(
+              `${updatedContact.name}'s number was changed to ${updatedContact.number} successfully`,
+            );
+            setTimeout(() => {
+              setNotification(null);
+            }, 5000);
           });
       }
       setNewName("");
@@ -80,9 +91,13 @@ const App = () => {
       number: newNumber,
     };
 
-    contactService
-      .create(nameObject)
-      .then((contactToAdd) => setContacts(contacts.concat(contactToAdd)));
+    contactService.create(nameObject).then((contactToAdd) => {
+      setContacts(contacts.concat(contactToAdd));
+      setNotification(`${contactToAdd.name} successfully added to phonebook`);
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+    });
     setNewName("");
     setNewNumber("");
   };
@@ -95,15 +110,28 @@ const App = () => {
         `Are you sure you want to delete contact: '${contactToDelete?.name}'?`,
       )
     ) {
-      contactService.remove(id).then(() => {
-        setContacts(contacts.filter((c) => c.id !== id));
-      });
+      contactService
+        .remove(id)
+        .then(() => {
+          setContacts(contacts.filter((c) => c.id !== id));
+        })
+        .catch(() => {
+          setError(
+            `Information of ${contactToDelete.name} has already been removed from server`,
+          );
+          setContacts(contacts.filter((c) => c.id !== contactToDelete.id));
+          setTimeout(() => {
+            setNotification(null);
+          }, 5000);
+        });
     }
   };
 
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={notification} />
+      <Error message={error} />
       <Filter onChange={onFilterChange} />
       <AddContact
         onSubmit={addContact}

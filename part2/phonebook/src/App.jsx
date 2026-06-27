@@ -2,7 +2,6 @@ import { useState } from "react";
 import Contacts from "./Components/Contacts";
 import Filter from "./Components/Filter";
 import AddContact from "./Components/AddContact";
-import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -12,7 +11,7 @@ const App = () => {
     { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
   ]);
   const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("+358");
+  const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
 
   const onFilterChange = (e) => {
@@ -24,14 +23,7 @@ const App = () => {
   };
 
   const onNumberChange = (e) => {
-    const value = e.target.value;
-    const prefix = "+358";
-
-    if (!value.startsWith(prefix)) {
-      setNewNumber(prefix);
-    } else {
-      setNewNumber(value);
-    }
+    setNewNumber(e.target.value);
   };
 
   const contactsToShow = filter
@@ -40,15 +32,6 @@ const App = () => {
 
   const addName = (e) => {
     e.preventDefault();
-
-    const phoneNumber = parsePhoneNumberFromString(newNumber, "FI");
-    if (!phoneNumber || !phoneNumber.isValid()) {
-      alert("Invalid phone number structure");
-      setNewNumber("");
-      return;
-    }
-
-    const formattedValue = phoneNumber.formatInternational();
 
     const currentMaxId =
       persons.length > 0 ? Math.max(...persons.map((p) => p.id)) : 0;
@@ -65,21 +48,21 @@ const App = () => {
 
     if (persons.some((n) => n.number === formattedValue)) {
       alert(
-        `${formattedValue} is already added to phonebook for contact ${getMatchingName(newNumber)}`,
+        `${newNumber} is already added to phonebook for contact ${getMatchingName(newNumber)}`,
       );
-      setNewNumber("+358");
+      setNewNumber("");
       return;
     }
 
     const nameObject = {
       id: currentMaxId + 1,
       name: newName,
-      number: formattedValue,
+      number: newNumber,
     };
 
     setPersons(persons.concat(nameObject));
     setNewName("");
-    setNewNumber("+358");
+    setNewNumber("");
   };
 
   return (

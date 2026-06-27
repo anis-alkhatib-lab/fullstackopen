@@ -1,0 +1,9 @@
+version = 1
+
+[[apps]]
+name = "frontend"
+command = "npm run dev"
+
+[[apps]]
+name = "backend"
+command = "npx json-server -p 3001 db.json"

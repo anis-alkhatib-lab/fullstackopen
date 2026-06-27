@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import Contacts from "./Components/Contacts";
 import Filter from "./Components/Filter";
 import AddContact from "./Components/AddContact";
-import axios from "axios";
-
-const DB_URL = "http://localhost:3001/persons";
+import contacService from "./services/contacts";
+import contactService from "./services/contacts";
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
+  const [contacts, setContacts] = useState([]);
   useEffect(() => {
-    axios.get(DB_URL).then((response) => {
-      setPersons(response.data);
+    contacService.getAll().then((initialContacts) => {
+      setContacts(initialContacts);
     });
   });
 
@@ -31,26 +30,25 @@ const App = () => {
   };
 
   const contactsToShow = filter
-    ? persons.filter((n) => n.name.toLowerCase().includes(filter.toLowerCase()))
-    : persons;
+    ? contacts.filter((n) =>
+        n.name.toLowerCase().includes(filter.toLowerCase()),
+      )
+    : contacts;
 
-  const addName = (e) => {
+  const addContact = (e) => {
     e.preventDefault();
 
-    const currentMaxId =
-      persons.length > 0 ? Math.max(...persons.map((p) => p.id)) : 0;
-
     const getMatchingName = (num) => {
-      return persons.find((n) => n.number === num)?.name || "Unknown";
+      return contacts.find((n) => n.number === num)?.name || "Unknown";
     };
 
-    if (persons.some((n) => n.name.toLowerCase() === newName.toLowerCase())) {
+    if (contacts.some((n) => n.name.toLowerCase() === newName.toLowerCase())) {
       alert(`${newName} is already added to phonebook`);
       setNewName("");
       return;
     }
 
-    if (persons.some((n) => n.number === formattedValue)) {
+    if (contacts.some((n) => n.number === newNumber)) {
       alert(
         `${newNumber} is already added to phonebook for contact ${getMatchingName(newNumber)}`,
       );
@@ -59,12 +57,13 @@ const App = () => {
     }
 
     const nameObject = {
-      id: currentMaxId + 1,
       name: newName,
       number: newNumber,
     };
 
-    setPersons(persons.concat(nameObject));
+    contactService
+      .create(nameObject)
+      .then((contactToAdd) => setContacts(contacts.concat(contactToAdd)));
     setNewName("");
     setNewNumber("");
   };
@@ -74,7 +73,7 @@ const App = () => {
       <h1>Phonebook</h1>
       <Filter onChange={onFilterChange} />
       <AddContact
-        onSubmit={addName}
+        onSubmit={addContact}
         onNameChange={onNameChange}
         onNumberChange={onNumberChange}
         newName={newName}

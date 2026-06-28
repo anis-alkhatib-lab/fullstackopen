@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import CountryInfo from "./components/CountryInfo";
 import CountriesList from "./components/CountriesList";
 import countryService from "./services/countries";
+import weatherService from "./services/weather";
 
 export const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,6 +11,15 @@ export const App = () => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [countryWeather, setCountryWeather] = useState(null);
+
+  const filteredCountries = countries.filter((item) => {
+    return item.name.common.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  const activeCountry =
+    selectedCountry ||
+    (filteredCountries.length === 1 ? filteredCountries[0] : null);
 
   useEffect(() => {
     countryService
@@ -24,17 +34,26 @@ export const App = () => {
       });
   }, []);
 
-  const filteredCountries = countries.filter((item) => {
-    return item.name.common.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  useEffect(() => {
+    if (activeCountry) {
+      setLoading(true);
+      weatherService
+        .getWeatherInfo(activeCountry.latlng[0], activeCountry.latlng[1])
+        .then((weatherData) => {
+          setCountryWeather(weatherData);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError(true);
+          setLoading(false);
+        });
+    }
+  }, [activeCountry]);
 
   useEffect(() => {
     setSelectedCountry(null);
+    setCountryWeather(null);
   }, [searchTerm]);
-
-  const activeCountry =
-    selectedCountry ||
-    (filteredCountries.length === 1 ? filteredCountries[0] : null);
 
   let content;
 
@@ -43,7 +62,7 @@ export const App = () => {
   };
 
   if (loading) {
-    content = <div>Loading countries...</div>;
+    content = <div>Loading... </div>;
   } else if (error) {
     content = <div>Failed to fetch data</div>;
   } else if (!searchTerm) {
@@ -51,7 +70,7 @@ export const App = () => {
   } else if (searchTerm && filteredCountries.length > 10) {
     content = <div>Too many matches, specify another filter</div>;
   } else if (activeCountry) {
-    content = <CountryInfo country={activeCountry} />;
+    content = <CountryInfo country={activeCountry} weather={countryWeather} />;
   } else {
     content = (
       <CountriesList countries={filteredCountries} onClick={handleMoreInfo} />

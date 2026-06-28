@@ -1,5 +1,5 @@
-export const CountryInfo = ({ country }) => {
-  if (!country) {
+export const CountryInfo = ({ country, weather }) => {
+  if (!country || !weather) {
     return null;
   }
   return (
@@ -24,6 +24,17 @@ export const CountryInfo = ({ country }) => {
         ))}
       </ul>
       <img src={`${country.flags.png}`} alt={`${country.name.common} flag`} />
+      <h2>Weather in {country.capital}</h2>
+      <p>Temperature {weather.main.temp} Celsius</p>
+      <p>
+        <div>
+          <img
+            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+            alt={weather.weather[0].description}
+          />
+        </div>
+        Wind {weather.wind.speed} m/s
+      </p>
     </div>
   );
 };

@@ -1,0 +1,90 @@
+### Get all persons
+GET http://localhost:3001/api/persons
+
+###
+
+### Get info
+GET http://localhost:3001/info
+
+###
+
+### Get person by ID (exists)
+GET http://localhost:3001/api/persons/1
+
+###
+
+### Get person by ID (does not exist)
+GET http://localhost:3001/api/persons/999999
+
+###
+
+### Add a new person
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "number": "555-123456"
+}
+
+###
+
+### Add another person
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "Jane Smith",
+  "number": "555-654321"
+}
+
+###
+
+### Error: Missing name
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "number": "123-456789"
+}
+
+###
+
+### Error: Missing number
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "Missing Number"
+}
+
+###
+
+### Error: Duplicate name
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "Arto Hellas",
+  "number": "999-999999"
+}
+
+###
+
+### Delete person (change the ID if needed)
+DELETE http://localhost:3001/api/persons/1
+
+###
+
+### Verify deletion
+GET http://localhost:3001/api/persons/1
+
+###
+
+### Get all persons after deletion
+GET http://localhost:3001/api/persons
+
+###
+
+### Unknown endpoint
+GET http://localhost:3001/api/unknown

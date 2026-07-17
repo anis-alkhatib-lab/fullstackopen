@@ -1,0 +1,2 @@
+### Delete person (change the ID if needed)
+DELETE http://localhost:3001/api/persons/1

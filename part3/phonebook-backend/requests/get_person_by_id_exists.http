@@ -1,0 +1,2 @@
+### Get person by ID (exists)
+GET http://localhost:3001/api/persons/1

@@ -1,0 +1,2 @@
+### Get info page
+GET http://localhost:3001/info

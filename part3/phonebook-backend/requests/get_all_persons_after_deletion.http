@@ -1,0 +1,2 @@
+### Get all persons after deletion
+GET http://localhost:3001/api/persons

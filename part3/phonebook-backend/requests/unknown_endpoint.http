@@ -1,0 +1,2 @@
+### Unknown endpoint (should be 404)
+GET http://localhost:3001/api/unknown

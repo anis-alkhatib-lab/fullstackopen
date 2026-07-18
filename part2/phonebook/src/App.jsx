@@ -2,25 +2,48 @@ import { useEffect, useState } from "react";
 import Contacts from "./Components/Contacts";
 import Filter from "./Components/Filter";
 import AddContact from "./Components/AddContact";
-import contacService from "./services/contacts";
 import contactService from "./services/contacts";
 import Notification from "./Components/Notification";
 import Error from "./Components/Error";
 import "./index.css";
 
 const App = () => {
-  const [contacts, setContacts] = useState([]);
-  useEffect(() => {
-    contacService.getAll().then((initialContacts) => {
-      setContacts(initialContacts);
-    });
-  }, []);
-
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
   const [notification, setNotification] = useState(null);
   const [error, setError] = useState(null);
+
+  const showError = (message) => {
+    setNotification(null);
+    setError(message);
+
+    setTimeout(() => {
+      setError(null);
+    }, 5000);
+  };
+
+  const showNotification = (message) => {
+    setError(null);
+    setNotification(message);
+
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
+
+  const [contacts, setContacts] = useState([]);
+  useEffect(() => {
+    contactService
+      .getAll()
+      .then((initialContacts) => {
+        setContacts(initialContacts);
+      })
+      .catch(() => {
+        const message = "Unable to load contacts from the server";
+        showError(message);
+      });
+  }, []);
 
   const onFilterChange = (e) => {
     setFilter(e.target.value);
@@ -43,9 +66,8 @@ const App = () => {
   const addContact = (e) => {
     e.preventDefault();
 
-    const getMatchingName = (num) => {
-      return contacts.find((n) => n.number === num)?.name || "Unknown";
-    };
+    const matchingName =
+      contacts.find((c) => c.number === newNumber)?.name || "Unknown";
 
     if (contacts.some((n) => n.name.toLowerCase() === newName.toLowerCase())) {
       if (
@@ -60,27 +82,28 @@ const App = () => {
         contactService
           .update(contactToUpdate.id, updatedContact)
           .then((updateResult) => {
-            setContacts(
-              contacts.map((c) =>
-                c.id === updateResult.id ? updateResult : c,
-              ),
+            setContacts((prev) =>
+              prev.map((c) => (c.id === updateResult.id ? updateResult : c)),
             );
-            setNotification(
+
+            showNotification(
               `${updatedContact.name}'s number was changed to ${updatedContact.number} successfully`,
             );
-            setTimeout(() => {
-              setNotification(null);
-            }, 5000);
+
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((err) => {
+            const message = err.response?.data?.error ?? "something went wrong";
+            showError(message);
           });
       }
-      setNewName("");
-      setNewNumber("");
       return;
     }
 
     if (contacts.some((n) => n.number === newNumber)) {
       alert(
-        `${newNumber} is already added to phonebook for contact ${getMatchingName(newNumber)}`,
+        `${newNumber} is already added to phonebook for contact ${matchingName}`,
       );
       setNewNumber("");
       return;
@@ -91,15 +114,22 @@ const App = () => {
       number: newNumber,
     };
 
-    contactService.create(nameObject).then((contactToAdd) => {
-      setContacts(contacts.concat(contactToAdd));
-      setNotification(`${contactToAdd.name} successfully added to phonebook`);
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-    });
-    setNewName("");
-    setNewNumber("");
+    contactService
+      .create(nameObject)
+      .then((contactToAdd) => {
+        setContacts((prev) => prev.concat(contactToAdd));
+
+        showNotification(
+          `${contactToAdd.name} successfully added to phonebook`,
+        );
+
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((err) => {
+        const message = err.response?.data?.error ?? "something went wrong";
+        showError(message);
+      });
   };
 
   const deleteContact = (id) => {
@@ -113,16 +143,14 @@ const App = () => {
       contactService
         .remove(id)
         .then(() => {
-          setContacts(contacts.filter((c) => c.id !== id));
+          setContacts((prev) => prev.filter((c) => c.id !== id));
         })
         .catch(() => {
-          setError(
-            `Information of ${contactToDelete.name} has already been removed from server`,
+          const message = `Information of ${contactToDelete.name} has already been removed from server`;
+          showError(message);
+          setContacts((prev) =>
+            prev.filter((c) => c.id !== contactToDelete.id),
           );
-          setContacts(contacts.filter((c) => c.id !== contactToDelete.id));
-          setTimeout(() => {
-            setNotification(null);
-          }, 5000);
         });
     }
   };

@@ -16,6 +16,7 @@ const contactSchema = new mongoose.Schema({
     type: String,
     required: [true, "name is required"],
     unique: true,
+    minlength: [3, "name must be at least 3 characters long"],
   },
   number: {
     type: String,

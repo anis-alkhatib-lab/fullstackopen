@@ -80,6 +80,31 @@ app.post("/api/persons", (req, res, next) => {
     .catch(next);
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const { name, number } = req.body;
+  const { id } = req.params;
+
+  if (!name || !number) {
+    return res.status(400).json({
+      error: "name and number are required",
+    });
+  }
+
+  Contact.findById(id)
+    .then((contact) => {
+      if (!contact) {
+        return res.status(404).end();
+      }
+
+      contact.name = name;
+      contact.number = number;
+
+      return contact.save();
+    })
+    .then((saved) => res.json(saved))
+    .catch(next);
+});
+
 app.use(unknownEndpoint);
 app.use(errorHandler);
 

@@ -59,8 +59,8 @@ const App = () => {
 
   const contactsToShow = filter
     ? contacts.filter((n) =>
-        n.name.toLowerCase().includes(filter.toLowerCase()),
-      )
+      n.name.toLowerCase().includes(filter.toLowerCase()),
+    )
     : contacts;
 
   const addContact = (e) => {

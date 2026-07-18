@@ -1,25 +1,25 @@
 const errorHandler = (error, _, res, next) => {
-  console.log(error.message);
+  console.log(error.message)
 
   if (error.code === 11000) {
     return res.status(400).json({
-      error: "name must be unique",
-    });
+      error: 'name must be unique',
+    })
   }
 
-  if (error.name === "ValidationError") {
+  if (error.name === 'ValidationError') {
     return res.status(400).json({
       error: error.message,
-    });
+    })
   }
 
-  if (error.name === "CastError") {
+  if (error.name === 'CastError') {
     return res.status(400).json({
-      error: "malformed id",
-    });
+      error: 'malformed id',
+    })
   }
 
-  next(error);
-};
+  next(error)
+}
 
-module.exports = errorHandler;
+module.exports = errorHandler

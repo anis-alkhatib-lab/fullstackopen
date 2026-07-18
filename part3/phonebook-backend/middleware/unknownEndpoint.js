@@ -1,7 +1,7 @@
 const unknownEndpoint = (_, res) => {
   res.status(404).json({
-    error: "unknown endpoint",
-  });
-};
+    error: 'unknown endpoint',
+  })
+}
 
-module.exports = unknownEndpoint;
+module.exports = unknownEndpoint

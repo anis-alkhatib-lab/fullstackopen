@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const errorHandler = require("./middleware/errorHandler");
+const unknownEndpoint = require("./middleware/unknownEndpoint");
 const Contact = require("./models/contact");
 
 const app = express();
@@ -40,7 +42,7 @@ app.get("/api/persons", (_, res) => {
 });
 
 // GET single person
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   Contact.findById(req.params.id)
     .then((c) => {
       if (c) {
@@ -49,26 +51,20 @@ app.get("/api/persons/:id", (req, res) => {
         res.status(404).end();
       }
     })
-    .catch((error) => {
-      console.log(error);
-      res.status(400).json({ error: error.message });
-    });
+    .catch(next);
 });
 
 // DELETE person
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   Contact.findByIdAndDelete(req.params.id)
     .then(() => {
       res.status(204).end();
     })
-    .catch((error) => {
-      console.log(error);
-      res.status(400).json({ error: error.message });
-    });
+    .catch(next);
 });
 
 // POST new person
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
   const contact = new Contact({
@@ -81,31 +77,11 @@ app.post("/api/persons", (req, res) => {
     .then((saved) => {
       res.json(saved);
     })
-    .catch((error) => {
-      if (error.code === 11000) {
-        return res.status(400).json({
-          error: "name must be unique",
-        });
-      }
-
-      if (error.name === "ValidationError") {
-        return res.status(400).json({
-          error: error.message,
-        });
-      }
-      res.status(500).json({
-        error: "internal server error",
-      });
-    });
+    .catch(next);
 });
 
-const unknownEndpoint = (_, res) => {
-  res.status(404).json({
-    error: "unknown endpoint",
-  });
-};
-
 app.use(unknownEndpoint);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 

@@ -24,21 +24,25 @@ app.use(
 );
 
 // INFO
-app.get("/info", (_, res) => {
+app.get("/info", (_, res, next) => {
   const date = new Date();
-  Contact.countDocuments({}).then((count) => {
-    res.send(`
+  Contact.countDocuments({})
+    .then((count) => {
+      res.send(`
     <p>Phonebook has info for ${count} people</p>
     <p>${date}</p>
   `);
-  });
+    })
+    .catch(next);
 });
 
 // GET all persons
-app.get("/api/persons", (_, res) => {
-  Contact.find({}).then((c) => {
-    res.json(c);
-  });
+app.get("/api/persons", (_, res, next) => {
+  Contact.find({})
+    .then((c) => {
+      res.json(c);
+    })
+    .catch(next);
 });
 
 // GET single person
@@ -80,6 +84,7 @@ app.post("/api/persons", (req, res, next) => {
     .catch(next);
 });
 
+// Update existing person
 app.put("/api/persons/:id", (req, res, next) => {
   const { name, number } = req.body;
   const { id } = req.params;

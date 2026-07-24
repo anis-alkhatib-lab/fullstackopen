@@ -59,7 +59,24 @@ describe('most blogs', () => {
   })
 })
 
-describe('most blogs', () => {
+describe('most blogs lodash', () => {
+  test('when list is empty, return an empty object', () => {
+    const result = listHelper.mostBlogsLodash([])
+    assert.deepStrictEqual(result, {})
+  })
+
+  test('when list has one blog, return an object with the author and blogs equals 1', () => {
+    const result = listHelper.mostBlogsLodash(listWithOneBlog)
+    assert.deepStrictEqual(result, { author: listWithOneBlog[0]['author'], blogs: 1 })
+  })
+
+  test('when list has many blogs, return an object with the author of the most blogs and blogs as the number of blogs written by that author', () => {
+    const result = listHelper.mostBlogsLodash(listWithManyBlogs)
+    assert.deepStrictEqual(result, { author: 'Robert C. Martin', blogs: 3 })
+  })
+})
+
+describe('most likes', () => {
   test('when list is empty, return an empty object', () => {
     const result = listHelper.mostLikes([])
     assert.deepStrictEqual(result, {})
@@ -75,6 +92,26 @@ describe('most blogs', () => {
 
   test('when list has many blogs, return an object with the author of the most blogs and blogs as the number of blogs written by that author', () => {
     const result = listHelper.mostLikes(listWithManyBlogs)
+    assert.deepStrictEqual(result, { author: 'Edsger W. Dijkstra', likes: 17 })
+  })
+})
+
+describe('most likes lodash', () => {
+  test('when list is empty, return an empty object', () => {
+    const result = listHelper.mostLikesLodash([])
+    assert.deepStrictEqual(result, {})
+  })
+
+  test('when list has one blog, return an object with that blog author and its total likes', () => {
+    const result = listHelper.mostLikesLodash(listWithOneBlog)
+    assert.deepStrictEqual(result, {
+      author: listWithOneBlog[0]['author'],
+      likes: listWithOneBlog[0]['likes'],
+    })
+  })
+
+  test('when list has many blogs, return an object with the author of the most blogs and blogs as the number of blogs written by that author', () => {
+    const result = listHelper.mostLikesLodash(listWithManyBlogs)
     assert.deepStrictEqual(result, { author: 'Edsger W. Dijkstra', likes: 17 })
   })
 })

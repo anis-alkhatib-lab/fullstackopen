@@ -1,4 +1,5 @@
 const { listWithManyBlogs } = require('../tests/tests_data')
+const _ = require('lodash')
 
 const dummy = (blogs) => {
   return 1
@@ -34,6 +35,19 @@ const mostBlogs = (blogs) => {
   }
 }
 
+const mostBlogsLodash = (blogs) => {
+  if (blogs.length === 0) return {}
+
+  return _.chain(blogs)
+    .groupBy('author')
+    .map((blogs, author) => ({
+      author,
+      blogs: blogs.length,
+    }))
+    .maxBy('blogs')
+    .value()
+}
+
 const mostLikes = (blogs) => {
   if (blogs.length === 0) return {}
 
@@ -44,7 +58,6 @@ const mostLikes = (blogs) => {
   for (const { author } of blogs) {
     counts[author] = 0
   }
-  console.log(counts)
 
   for (const { author, likes } of blogs) {
     counts[author] += likes
@@ -53,13 +66,24 @@ const mostLikes = (blogs) => {
       maxAuthor = author
     }
   }
-  console.log(counts)
-  console.log({ maxAuthor: maxAuthor, maxLikes: maxLikes })
 
   return {
     author: maxAuthor,
     likes: maxLikes,
   }
+}
+
+const mostLikesLodash = (blogs) => {
+  if (blogs.length === 0) return {}
+
+  return _.chain(blogs)
+    .groupBy('author')
+    .map((blogs, author) => ({
+      author,
+      likes: _.sumBy(blogs, 'likes'),
+    }))
+    .maxBy('likes')
+    .value()
 }
 
 mostLikes(listWithManyBlogs)
@@ -70,4 +94,6 @@ module.exports = {
   favoriteBlog,
   mostBlogs,
   mostLikes,
+  mostLikesLodash,
+  mostBlogsLodash,
 }
